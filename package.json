@@ -1,0 +1,32 @@
+{
+  "name": "stackvm",
+  "version": "1.0.0",
+  "description": "javascript code obfuscator based on stack virtual machine virtualization",
+  "keywords": [
+    "stackvm",
+    "jsvm",
+    "virtualizator",
+    "obfuscator",
+    "protector",
+    "virtual-machine",
+    "javascript-virtual-machine"
+  ],
+  "license": "UNLICENSED",
+  "author": "x676w",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/x676w/StackVM.git"
+  },
+  "bugs": {
+    "url": "https://github.com/x676w/StackVM/issues"
+  },
+  "homepage": "https://github.com/x676w/StackVM#readme",
+  "dependencies": {
+    "typescript": "^5.8.3"
+  }
+}
