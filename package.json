@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/x676w/StackVM#readme",
   "dependencies": {
+    "@babel/parser": "^7.27.5",
+    "@babel/types": "^7.27.6",
     "typescript": "^5.8.3"
   }
 }
