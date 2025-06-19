@@ -1,5 +1,5 @@
 import { Node } from "@babel/types";
-import { SVBinaryExpression, SVBinaryOperator, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode } from "./nodes";
+import { SVBinaryExpression, SVBinaryOperator, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator } from "./nodes";
 import { parse } from "@babel/parser";
 
 export type TNodesRoot = SVNode[];
@@ -50,6 +50,15 @@ class Parser {
 
         svNode = new SVLogicalExpression(left, right, operator);
 
+        break;
+      };
+
+      case "UnaryExpression": {
+        const arg = this.scanNode(node.argument)!;
+        const operator = node.operator as SVUnaryOperator;
+
+        svNode = new SVUnaryExpression(arg, operator);
+        
         break;
       };
 

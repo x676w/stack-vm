@@ -20,11 +20,19 @@ export type SVBinaryOperator = "+"
   | "|"
   | "&";
 
-export type SVLogicalOperator = "||" | "&&";
+export type SVLogicalOperator = "||"
+  | "&&";
+
+export type SVUnaryOperator = "+"
+  | "-"
+  | "!"
+  | "~"
+  | "typeof";
 
 export type SVNodeType = "Literal"
   | "BinaryExpression"
-  | "LogicalExpression";
+  | "LogicalExpression"
+  | "UnaryExpression";
 
 export class SVNode {
   public nodeType: SVNodeType;
@@ -78,6 +86,18 @@ export class SVLogicalExpression extends SVNode {
 
     this.left = left;
     this.right = right;
+    this.operator = operator;
+  };
+};
+
+export class SVUnaryExpression extends SVNode {
+  public arg: SVNode;
+  public operator: SVUnaryOperator;
+
+  constructor(arg: SVNode, operator: SVUnaryOperator) {
+    super("UnaryExpression");
+
+    this.arg = arg;
     this.operator = operator;
   };
 };

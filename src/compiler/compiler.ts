@@ -1,6 +1,6 @@
 import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
-import { SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode } from "../parser/nodes";
+import { SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
 import { assert } from "../utils";
 
@@ -103,6 +103,26 @@ class Compiler {
         else if(operator === "&&")
           this.writeOp(opcodes.LOGICAL_AND);
 
+        break;
+      };
+
+      case "UnaryExpression": {
+        const arg = (node as SVUnaryExpression).arg;
+        const operator = (node as SVUnaryExpression).operator;
+
+        this.walkNode(arg);
+        
+        if(operator === "+")
+          this.writeOp(opcodes.UNARY_PLUS);
+        else if(operator === "-")
+          this.writeOp(opcodes.UNARY_MINUS);
+        else if(operator === "!")
+          this.writeOp(opcodes.UNARY_NOT);
+        else if(operator === "~")
+          this.writeOp(opcodes.UNARY_BIT_NOT);
+        else if(operator === "typeof")
+          this.writeOp(opcodes.UNARY_TYPEOF);
+        
         break;
       };
     };
