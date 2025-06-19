@@ -1,12 +1,111 @@
+import opcodes from "../opcodes";
+import { IOperationCode } from "../opcodes";
+import { SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
+import { assert } from "../utils";
 
 class Compiler {
-  private buffer:  number[];
-  private strings: string[];
+  private buffer      :  number[];
+  private strings     : string[];
+  private usedOpcodes : IOperationCode[];
 
   constructor() {
-    this.buffer   = [];
-    this.strings  = [];
+    this.buffer      = [];
+    this.strings     = [];
+    this.usedOpcodes = [];
+  };
+
+  private writeInstruction(instruction: number) {
+    assert(
+      instruction >= 0 &&
+      instruction <= 255,
+      "Instruction value must be in range 0-255 (uint8)"
+    );
+    
+    this.buffer.push(instruction);
+  };
+
+  private writeOp(op: IOperationCode) {
+    this.writeInstruction(op.instruction);
+  };
+
+  private walkNode(node: SVNode) {
+    switch(node.nodeType) {
+      case "Literal": {
+        const arg = (node as SVLiteral).value;
+      
+        this.writeOp(opcodes.STACK_PUSH);
+        this.writeInstruction(arg);
+
+        break;
+      };
+
+      case "BinaryExpression": {
+        const right = (node as SVBinaryExpression).right;
+        const left = (node as SVBinaryExpression).left;
+        const operator = (node as SVBinaryExpression).operator;
+        
+        this.walkNode(right);
+        this.walkNode(left);
+
+        if(operator === "+")
+          this.writeOp(opcodes.BINARY_ADD);
+        else if(operator === "-")
+          this.writeOp(opcodes.BINARY_SUB);
+        else if(operator === "*")
+          this.writeOp(opcodes.BINARY_MUL);
+        else if(operator === "/")
+          this.writeOp(opcodes.BINARY_DIV);
+        else if(operator === "%")
+          this.writeOp(opcodes.BINARY_MOD);
+        else if(operator === "<")
+          this.writeOp(opcodes.BINARY_LESS);
+        else if(operator === "<=")
+          this.writeOp(opcodes.BINARY_LESS_OR_EQUAL);
+        else if(operator === ">")
+          this.writeOp(opcodes.BINARY_GREATER);
+        else if(operator === ">=")
+          this.writeOp(opcodes.BINARY_GREATER_OR_EQUAL);
+        else if(operator === "==")
+          this.writeOp(opcodes.BINARY_EQUAL);
+        else if(operator === "===")
+          this.writeOp(opcodes.BINARY_STRICT_EQUAL);
+        else if(operator === "!=")
+          this.writeOp(opcodes.BINARY_NOT_EQUAL);
+        else if(operator === "!==")
+          this.writeOp(opcodes.BINARY_STRICT_NOT_EQUAL);
+        else if(operator === "<<")
+          this.writeOp(opcodes.BINARY_BIT_SHIFT_LEFT);
+        else if(operator === ">>")
+          this.writeOp(opcodes.BINARY_BIT_SHIFT_RIGHT);
+        else if(operator === ">>>")
+          this.writeOp(opcodes.BINARY_BIT_SHIFT_RIGHT_UNSIGNED);
+        else if(operator === "^")
+          this.writeOp(opcodes.BINARY_BIT_XOR);
+        else if(operator === "|")
+          this.writeOp(opcodes.BINARY_BIT_XOR);
+        else if(operator === "&")
+          this.writeOp(opcodes.BINARY_BIT_AND);
+        
+        break;
+      };
+
+      case "LogicalExpression": {
+        const right = (node as SVLogicalExpression).right;
+        const left = (node as SVLogicalExpression).left;
+        const operator = (node as SVLogicalExpression).operator;
+
+        this.walkNode(right);
+        this.walkNode(left);
+        
+        if(operator === "||")
+          this.writeOp(opcodes.LOGICAL_OR);
+        else if(operator === "&&")
+          this.writeOp(opcodes.LOGICAL_AND);
+
+        break;
+      };
+    };
   };
 
   public compile(nodes: TNodesRoot) {

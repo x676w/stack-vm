@@ -3,3 +3,7 @@ export function assert(condition: any, message: string) {
     throw new Error(message);
   };
 };
+
+export function random(min: number, max: number) {
+  return min + Math.round(Math.random() * (max - min));
+};

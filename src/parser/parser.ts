@@ -1,5 +1,5 @@
 import { Node } from "@babel/types";
-import { SVLiteral, SVNode } from "./nodes";
+import { SVBinaryExpression, SVBinaryOperator, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode } from "./nodes";
 import { parse } from "@babel/parser";
 
 export type TNodesRoot = SVNode[];
@@ -11,24 +11,60 @@ class Parser {
     this.nodesRoot = [];
   };
 
-  private scanNode(node: Node) {
+  private scanNode(node: Node): SVNode | undefined {
     let svNode: SVNode | undefined;
     
     switch(node.type) {
-      case "StringLiteral":
+      case "StringLiteral": {
         svNode = new SVLiteral("string", node.value);
+
         break;
-      case "NumericLiteral":
+      };
+
+      case "NumericLiteral": {
         svNode = new SVLiteral("number", node.value);
+
         break;
-      case "BooleanLiteral":
+      };
+
+      case "BooleanLiteral": {
         svNode = new SVLiteral("boolean", node.value);
+
         break;
+      };
+
+      case "BinaryExpression": {
+        const left = this.scanNode(node.left)!;
+        const right = this.scanNode(node.right)!;
+        const operator = node.operator as SVBinaryOperator;
+
+        svNode = new SVBinaryExpression(left, right, operator);
+
+        break;
+      };
+
+      case "LogicalExpression": {
+        const left = this.scanNode(node.left)!;
+        const right = this.scanNode(node.right)!;
+        const operator = node.operator as SVLogicalOperator;
+
+        svNode = new SVLogicalExpression(left, right, operator);
+
+        break;
+      };
+
+      case "ExpressionStatement": {
+        this.scanNode(node.expression);
+
+        break;
+      };
     };
 
     if(svNode !== undefined) {
       this.nodesRoot.push(svNode);
     };
+
+    return svNode;
   };
 
   public parse(code: string) {

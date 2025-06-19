@@ -1,20 +1,46 @@
 import { assert } from "../utils";
 
-export class SVNode {
-  public type: string;
+export type SVBinaryOperator = "+"
+  | "-"
+  | "*"
+  | "/"
+  | "%"
+  | "<"
+  | "<="
+  | ">"
+  | ">="
+  | "=="
+  | "==="
+  | "!="
+  | "!=="
+  | "<<"
+  | ">>"
+  | ">>>"
+  | "^"
+  | "|"
+  | "&";
 
-  constructor(type: string) {
-    this.type = type;
+export type SVLogicalOperator = "||" | "&&";
+
+export type SVNodeType = "Literal"
+  | "BinaryExpression"
+  | "LogicalExpression";
+
+export class SVNode {
+  public nodeType: SVNodeType;
+
+  constructor(type: SVNodeType) {
+    this.nodeType = type;
   };
 };
 
 export class SVLiteral extends SVNode {
   public value: any;
 
-  constructor(type: "string" | "number" | "boolean", value: any) {
-    super(type);
+  constructor(valueType: "string" | "number" | "boolean", value: any) {
+    super("Literal");
 
-    switch(type) {
+    switch(valueType) {
       case "string":
         assert(typeof value === "string", "The value of a string literal node must be of type string");
         break;
@@ -25,5 +51,33 @@ export class SVLiteral extends SVNode {
         assert(typeof value === "boolean", "The value of a boolean literal node must be of type boolean");
         break;
     };
+  };
+};
+
+export class SVBinaryExpression extends SVNode {
+  public left: SVNode;
+  public right: SVNode;
+  public operator: SVBinaryOperator;
+
+  constructor(left: SVNode, right: SVNode, operator: SVBinaryOperator) {
+    super("BinaryExpression");
+
+    this.left = left;
+    this.right = right;
+    this.operator = operator;
+  };
+};
+
+export class SVLogicalExpression extends SVNode {
+  public left: SVNode;
+  public right: SVNode;
+  public operator: SVLogicalOperator;
+
+  constructor(left: SVNode, right: SVNode, operator: SVLogicalOperator) {
+    super("LogicalExpression");
+
+    this.left = left;
+    this.right = right;
+    this.operator = operator;
   };
 };
