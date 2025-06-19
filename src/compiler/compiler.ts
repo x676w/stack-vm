@@ -4,12 +4,12 @@ import { SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode, SVUnaryExpr
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
-  private program      :  number[];
+  private program     :  number[];
   private strings     : string[];
   private usedOpcodes : IOperationCode[];
 
   constructor() {
-    this.program      = [];
+    this.program     = [];
     this.strings     = [];
     this.usedOpcodes = [];
   };
