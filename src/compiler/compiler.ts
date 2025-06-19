@@ -2,27 +2,20 @@ import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
 import { SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
-import { assert } from "../utils";
 
 class Compiler {
-  private buffer      :  number[];
+  private program      :  number[];
   private strings     : string[];
   private usedOpcodes : IOperationCode[];
 
   constructor() {
-    this.buffer      = [];
+    this.program      = [];
     this.strings     = [];
     this.usedOpcodes = [];
   };
 
-  private writeInstruction(instruction: number) {
-    assert(
-      instruction >= 0 &&
-      instruction <= 255,
-      "Instruction value must be in range 0-255 (uint8)"
-    );
-    
-    this.buffer.push(instruction);
+  private writeInstruction(instruction: any) {
+    this.program.push(instruction);
   };
 
   private writeOp(op: IOperationCode) {
@@ -33,7 +26,7 @@ class Compiler {
     switch(node.nodeType) {
       case "Literal": {
         const arg = (node as SVLiteral).value;
-      
+
         this.writeOp(opcodes.STACK_PUSH);
         this.writeInstruction(arg);
 
@@ -128,8 +121,12 @@ class Compiler {
     };
   };
 
-  public compile(nodes: TNodesRoot) {
-    
+  public compile(nodeRoot: TNodesRoot) {
+    for(const node of nodeRoot) {
+      this.walkNode(node);
+    };
+
+    return this.program;
   };
 };
 

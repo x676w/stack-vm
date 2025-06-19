@@ -59,6 +59,8 @@ export class SVLiteral extends SVNode {
         assert(typeof value === "boolean", "The value of a boolean literal node must be of type boolean");
         break;
     };
+
+    this.value = value;
   };
 };
 

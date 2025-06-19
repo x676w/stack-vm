@@ -1,6 +1,6 @@
 import { Node } from "@babel/types";
 import { SVBinaryExpression, SVBinaryOperator, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator } from "./nodes";
-import { parse } from "@babel/parser";
+import { parseCode } from "../utils";
 
 export type TNodesRoot = SVNode[];
 
@@ -11,7 +11,7 @@ class Parser {
     this.nodesRoot = [];
   };
 
-  private scanNode(node: Node): SVNode | undefined {
+  private scanNode(node: Node, isForRoot = true): SVNode | undefined {
     let svNode: SVNode | undefined;
     
     switch(node.type) {
@@ -34,8 +34,8 @@ class Parser {
       };
 
       case "BinaryExpression": {
-        const left = this.scanNode(node.left)!;
-        const right = this.scanNode(node.right)!;
+        const left = this.scanNode(node.left, false)!;
+        const right = this.scanNode(node.right, false)!;
         const operator = node.operator as SVBinaryOperator;
 
         svNode = new SVBinaryExpression(left, right, operator);
@@ -44,8 +44,8 @@ class Parser {
       };
 
       case "LogicalExpression": {
-        const left = this.scanNode(node.left)!;
-        const right = this.scanNode(node.right)!;
+        const left = this.scanNode(node.left, false)!;
+        const right = this.scanNode(node.right, false)!;
         const operator = node.operator as SVLogicalOperator;
 
         svNode = new SVLogicalExpression(left, right, operator);
@@ -54,7 +54,7 @@ class Parser {
       };
 
       case "UnaryExpression": {
-        const arg = this.scanNode(node.argument)!;
+        const arg = this.scanNode(node.argument, false)!;
         const operator = node.operator as SVUnaryOperator;
 
         svNode = new SVUnaryExpression(arg, operator);
@@ -63,13 +63,13 @@ class Parser {
       };
 
       case "ExpressionStatement": {
-        this.scanNode(node.expression);
+        svNode = this.scanNode(node.expression, false);
 
         break;
       };
     };
 
-    if(svNode !== undefined) {
+    if(svNode !== undefined && isForRoot) {
       this.nodesRoot.push(svNode);
     };
 
@@ -77,7 +77,7 @@ class Parser {
   };
 
   public parse(code: string) {
-    const tree = parse(code);
+    const tree = parseCode(code);
 
     for(const node of tree.program.body) {
       this.scanNode(node);
