@@ -1,6 +1,6 @@
 import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
-import { SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
+import { SVArrayExpression, SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
@@ -115,6 +115,19 @@ class Compiler {
           this.writeOp(opcodes.UNARY_BIT_NOT);
         else if(operator === "typeof")
           this.writeOp(opcodes.UNARY_TYPEOF);
+        
+        break;
+      };
+
+      case "ArrayExpression": {
+        const elements = (node as SVArrayExpression).elements;
+
+        for(const element of elements) {
+          this.walkNode(element);
+        };
+
+        this.writeOp(opcodes.BUILD_ARRAY);
+        this.writeInstruction(elements.length);
         
         break;
       };

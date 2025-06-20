@@ -32,7 +32,9 @@ export type SVUnaryOperator = "+"
 export type SVNodeType = "Literal"
   | "BinaryExpression"
   | "LogicalExpression"
-  | "UnaryExpression";
+  | "UnaryExpression"
+  | "ArrayExpression"
+  | "Identifier";
 
 export class SVNode {
   public nodeType: SVNodeType;
@@ -101,5 +103,27 @@ export class SVUnaryExpression extends SVNode {
 
     this.arg = arg;
     this.operator = operator;
+  };
+};
+
+export class SVArrayExpression extends SVNode {
+  public elements: SVNode[];
+  
+  constructor(elements: SVNode[]) {
+    super("ArrayExpression");
+
+    this.elements = elements;
+  };
+};
+
+export class SVIdentifier extends SVNode {
+  public name: string;
+  public global: boolean;
+
+  constructor(name: string, global?: boolean) {
+    super("Identifier");
+
+    this.name = name;
+    this.global = global ?? false;
   };
 };
