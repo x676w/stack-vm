@@ -9,7 +9,7 @@ function obfuscate(code: string) {
 
   const program = compiler.compile(nodesRoot);
 
-  console.log("Program:", program);
+  return program;
 };
 
 export default obfuscate;

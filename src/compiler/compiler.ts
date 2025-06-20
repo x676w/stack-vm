@@ -4,8 +4,8 @@ import { SVArrayExpression, SVBinaryExpression, SVLiteral, SVLogicalExpression, 
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
-  private program     :  number[];
-  private usedOpcodes : IOperationCode[];
+  private program     : number[];
+  private usedOpcodes : number[];
 
   constructor() {
     this.program     = [];
@@ -18,6 +18,14 @@ class Compiler {
 
   private writeOp(op: IOperationCode) {
     this.writeInstruction(op.instruction);
+
+    if(!this.usedOpcodes.includes(op.instruction)) {
+      this.usedOpcodes.push(op.instruction);
+
+      console.log(
+        `Used [${op.name}] (${op.instruction})`
+      );
+    };
   };
 
   private walkNode(node: SVNode) {
