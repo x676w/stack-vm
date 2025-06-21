@@ -1,7 +1,5 @@
 # StackVM
 
-[![License](https://img.shields.io/badge/license-UNLICENSED-lightgray.svg)]()
-
 JavaScript code obfuscator based on stack virtual machine virtualization. Transforms your JavaScript code into a virtualized stack-based representation, making it harder to understand while maintaining functionality.
 
 # Features
@@ -62,5 +60,4 @@ Not a strong obfuscation solution for security-critical applications
 
 May impact performance for complex operations
 
-# License
-UNLICENSED
+[![License](https://img.shields.io/badge/license-UNLICENSED-lightgray.svg)]()
