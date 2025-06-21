@@ -1,7 +1,7 @@
 const obfuscate = require("./dist").default;
 
 console.log(obfuscate(`
-  let string = "Hello, World!";
+  const string = "Hello, World!";
 
-  let string2 = string;
+  const string2 = string;
 `));

@@ -78,10 +78,9 @@ export class SVScope {
   public getVariable(name: string) {
     const definition = this.variables.get(name);
 
-    if(!definition)
-      throw new Error(name + " is not defined.");
+    assert(definition, name + " is not defined.");
 
-    return definition;
+    return definition!;
   };
 
   public getVariableInParentRoot(name: string): SVScopeDefinition {
@@ -96,8 +95,7 @@ export class SVScope {
   public defineVariable(name: string, constant: boolean) {
     const isDefined = this.variables.has(name);
 
-    if(isDefined)
-      throw new Error(name + " is already defined");
+    assert(!isDefined, name + " is already defined.");
 
     const definition = new SVScopeDefinition(
       this.variables.size, constant, this
