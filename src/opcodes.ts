@@ -14,7 +14,7 @@ function generateUniqueOpInstruction() {
   if(opInstructionsSet.has(generation))
     return generateUniqueOpInstruction();
   else
-    return generation;
+    return opInstructionsSet.add(generation), generation;
 };
 
 class OperationCode implements IOperationCode {
@@ -47,12 +47,12 @@ const BINARY_STRICT_EQUAL              = new OperationCode("BINARY_STRICT_EQUAL"
 const BINARY_NOT_EQUAL                 = new OperationCode("BINARY_NOT_EQUAL");
 const BINARY_STRICT_NOT_EQUAL          = new OperationCode("BINARY_STRICT_NOT_EQUAL");
 
-const BINARY_BIT_SHIFT_LEFT            = new OperationCode("BIT_SHIFT_LEFT");
-const BINARY_BIT_SHIFT_RIGHT           = new OperationCode("BIT_SHIFT_RIGHT");
-const BINARY_BIT_SHIFT_RIGHT_UNSIGNED  = new OperationCode("BIT_SHIFT_RIGHT_UNSIGNED");
-const BINARY_BIT_XOR                   = new OperationCode("BIT_XOR");
-const BINARY_BIT_AND                   = new OperationCode("BIT_AND");
-const BINARY_BIT_OR                    = new OperationCode("BIT_OR");
+const BINARY_BIT_SHIFT_LEFT            = new OperationCode("BINARY_BIT_SHIFT_LEFT");
+const BINARY_BIT_SHIFT_RIGHT           = new OperationCode("BINARY_BIT_SHIFT_RIGHT");
+const BINARY_BIT_SHIFT_RIGHT_UNSIGNED  = new OperationCode("BINARY_BIT_SHIFT_RIGHT_UNSIGNED");
+const BINARY_BIT_XOR                   = new OperationCode("BINARY_BIT_XOR");
+const BINARY_BIT_AND                   = new OperationCode("BINARY_BIT_AND");
+const BINARY_BIT_OR                    = new OperationCode("BINARY_BIT_OR");
 
 const LOGICAL_OR                       = new OperationCode("LOGICAL_OR");
 const LOGICAL_AND                      = new OperationCode("LOGICAL_AND");
