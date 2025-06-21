@@ -60,4 +60,5 @@ Not a strong obfuscation solution for security-critical applications
 
 May impact performance for complex operations
 
+# License
 [![License](https://img.shields.io/badge/license-UNLICENSED-lightgray.svg)]()
