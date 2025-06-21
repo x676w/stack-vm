@@ -4,14 +4,14 @@
 
 JavaScript code obfuscator based on stack virtual machine virtualization. Transforms your JavaScript code into a virtualized stack-based representation, making it harder to understand while maintaining functionality.
 
-### Features
+# Features
 
 - Converts JavaScript code to stack-based virtual machine instructions
 - Preserves original program functionality
 - Lightweight obfuscation solution
 - Focus on core JavaScript features
 
-### Installation
+# Installation
 ```bash
 git clone https://github.com/x676w/StackVM
 
@@ -33,7 +33,7 @@ const program = obfuscate(`
 console.log(program);
 ```
 
-### Supported Features
+# Supported Features
 - Arithmetic	          ✅
 - Variables	            ✅
 - Logical Expressions	  ✅
@@ -44,7 +44,7 @@ console.log(program);
 - Loops	                ❌​
 - Conditionals	        ❌​
 
-### How It Works
+# How It Works
 StackVM transforms your JavaScript code into a series of stack operations executed by a virtual machine. The original code structure is replaced with:
 
 A stack-based instruction set
@@ -55,12 +55,12 @@ Obfuscated data storage
 
 This approach makes reverse engineering more difficult while keeping the runtime behavior identical.
 
-### Limitations
+# Limitations
 Currently only supports a subset of JavaScript features
 
 Not a strong obfuscation solution for security-critical applications
 
 May impact performance for complex operations
 
-### License
+# License
 UNLICENSED
