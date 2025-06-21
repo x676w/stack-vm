@@ -66,6 +66,7 @@ const UNARY_TYPEOF                     = new OperationCode("UNARY_TYPEOF");
 const STORE_VARIABLE                   = new OperationCode("STORE_VARIABLE");
 const STORE_CONSTANT                   = new OperationCode("STORE_CONSTANT");
 const LOAD_FROM_SCOPE                  = new OperationCode("LOAD_FROM_SCOPE");
+const LOAD_FROM_GLOBAL                 = new OperationCode("LOAD_FROM_GLOBAL");
 
 const BUILD_ARRAY                      = new OperationCode("BUILD_ARRAY");
 const BUILD_OBJECT                     = new OperationCode("BUILD_OBJECT");
@@ -113,6 +114,7 @@ export default {
   STORE_VARIABLE,
   STORE_CONSTANT,
   LOAD_FROM_SCOPE,
+  LOAD_FROM_GLOBAL,
 
   BUILD_ARRAY,
   BUILD_OBJECT,

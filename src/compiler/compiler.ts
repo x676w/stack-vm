@@ -1,15 +1,17 @@
 import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
-import { SVArrayExpression, SVBinaryExpression, SVLiteral, SVLogicalExpression, SVNode, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
+import { SVArrayExpression, SVBinaryExpression, SVDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
   private program     : number[];
   private usedOpcodes : number[];
+  private scopes      : SVScope[];
 
   constructor() {
     this.program     = [];
     this.usedOpcodes = [];
+    this.scopes      = [new SVScope(0)];
   };
 
   private writeInstruction(instruction: any) {
@@ -26,6 +28,24 @@ class Compiler {
         `Used [${op.name}] (${op.instruction})`
       );
     };
+  };
+
+  private getCurrentScope() {
+    return this.scopes[this.scopes.length - 1];
+  };
+
+  private pushScope() {
+    const parent = this.getCurrentScope();
+
+    const newScope = new SVScope(
+      parent.id, parent
+    );
+
+    this.scopes.push(newScope);
+  };
+
+  private popScope() {
+    return this.scopes.length > 1 ? this.scopes.pop()! : this.scopes[this.scopes.length - 1];
   };
 
   private walkNode(node: SVNode) {
@@ -134,6 +154,70 @@ class Compiler {
 
         this.writeOp(opcodes.BUILD_ARRAY);
         this.writeInstruction(elements.length);
+        
+        break;
+      };
+
+      case "Identifier": {
+        const identifier = (node as SVIdentifier);
+
+        const scope = this.getCurrentScope();
+
+        if(scope.hasVariable(identifier.name)) {
+          const definition = scope.getVariable(identifier.name);
+
+          this.writeOp(opcodes.LOAD_FROM_SCOPE);
+          this.writeInstruction(scope.id);
+          this.writeInstruction(definition.id);
+        
+          return;
+        };
+        
+        if(scope.hasVariableInParentRoot(identifier.name)) {
+          const definition = scope.getVariableInParentRoot(identifier.name);
+          
+          this.writeOp(opcodes.LOAD_FROM_SCOPE);
+          this.writeInstruction(scope.id);
+          this.writeInstruction(definition.id);
+          
+          return;
+        };
+
+        if(identifier.global) {
+          this.writeOp(opcodes.LOAD_FROM_GLOBAL);
+          this.writeInstruction(identifier.name);
+
+          return;
+        };
+
+        this.writeOp(opcodes.STACK_PUSH);
+        this.writeInstruction(identifier.name);
+        
+        break;
+      };
+
+      case "Definition": {
+        const definition = node as SVDefinition;
+
+        const scope = this.getCurrentScope();
+
+        for(const variable of definition.variables) {
+          if(variable.value)
+            this.walkNode(variable.value)
+          else
+            this.writeInstruction(undefined);
+
+          const definition = scope.defineVariable(
+            variable.name, variable.constant
+          );
+
+          this.writeOp(
+            variable.constant ? opcodes.STORE_CONSTANT : opcodes.STORE_VARIABLE
+          );
+
+          this.writeInstruction(scope.id);
+          this.writeInstruction(definition.id);
+        };
         
         break;
       };

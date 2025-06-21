@@ -1,14 +1,17 @@
 import { Node } from "@babel/types";
-import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator } from "./nodes";
+import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType } from "./nodes";
 import { parseCode } from "../utils";
+import traverse from "@babel/traverse";
 
 export type TNodesRoot = SVNode[];
 
 class Parser {
-  private nodesRoot: TNodesRoot;
+  private globals   : Set<string>;
+  private nodesRoot : TNodesRoot;
 
   constructor() {
-    this.nodesRoot = [];
+    this.globals    = new Set();
+    this.nodesRoot  = [];
   };
 
   private scanNode(node: Node, isForRoot = true): SVNode | undefined {
@@ -78,8 +81,33 @@ class Parser {
       };
 
       case "ExpressionStatement": {
-        svNode = this.scanNode(node.expression, false);
+        this.scanNode(node.expression, false);
 
+        break;
+      };
+
+      case "Identifier": {
+        svNode = new SVIdentifier(node.name, this.globals.has(node.name));
+        
+        break;
+      };
+
+      case "VariableDeclaration": {
+        const variables: SVVariableDefinitionType[] = [];
+
+        for(const declarator of node.declarations) {
+          if(declarator.id.type !== 'Identifier')
+            continue;
+
+          variables.push({
+            name: declarator.id.name,
+            constant: node.kind === "const",
+            value: declarator.init ? this.scanNode(declarator.init, false) : undefined
+          });
+        };
+
+        svNode = new SVDefinition(variables);
+        
         break;
       };
     };
@@ -93,6 +121,17 @@ class Parser {
 
   public parse(code: string) {
     const tree = parseCode(code);
+
+    traverse(tree, {
+      Identifier: (path) => {
+        const isGlobal = path.scope.hasGlobal(path.node.name);
+
+        if(!isGlobal || this.globals.has(path.node.name))
+          return;
+
+        this.globals.add(path.node.name);
+      }
+    });
 
     for(const node of tree.program.body) {
       this.scanNode(node);

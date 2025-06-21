@@ -34,7 +34,80 @@ export type SVNodeType = "Literal"
   | "LogicalExpression"
   | "UnaryExpression"
   | "ArrayExpression"
-  | "Identifier";
+  | "Identifier"
+  | "Definition";
+
+export type SVVariableDefinitionType = {
+  name: string,
+  constant: boolean,
+  value: SVNode | undefined
+}
+
+  
+export class SVScopeDefinition {
+  public id: number;
+  public constant: boolean;
+  public scope: SVScope;
+  
+  constructor(id: number, constant: boolean, scope: SVScope) {
+    this.id = id;
+    this.constant = constant;
+    this.scope = scope;
+  };
+};
+
+export class SVScope {
+  public id: number;
+  public parent: SVScope | null;
+  public variables: Map<string, SVScopeDefinition>;
+  
+  constructor(id: number, parent?: SVScope) {
+    this.id = id;
+    this.parent = parent ?? null;
+    this.variables = new Map();
+  };
+
+  public hasVariable(name: string): boolean {
+    return this.variables.has(name);
+  };
+
+  public hasVariableInParentRoot(name: string) {
+    return this.variables.has(name) || !!(this.parent && this.parent.hasVariable(name));;
+  };
+
+  public getVariable(name: string) {
+    const definition = this.variables.get(name);
+
+    if(!definition)
+      throw new Error(name + " is not defined.");
+
+    return definition;
+  };
+
+  public getVariableInParentRoot(name: string): SVScopeDefinition {
+    if(this.hasVariable(name))
+      return this.getVariable(name);
+    else if(this.parent)
+      return this.parent.getVariableInParentRoot(name);
+    else
+      throw new Error(name + " is not defined.");
+  };
+
+  public defineVariable(name: string, constant: boolean) {
+    const isDefined = this.variables.has(name);
+
+    if(isDefined)
+      throw new Error(name + " is already defined");
+
+    const definition = new SVScopeDefinition(
+      this.variables.size, constant, this
+    );
+
+    this.variables.set(name, definition);
+
+    return definition;
+  };
+};
 
 export class SVNode {
   public nodeType: SVNodeType;
@@ -125,5 +198,15 @@ export class SVIdentifier extends SVNode {
 
     this.name = name;
     this.global = global ?? false;
+  };
+};
+
+export class SVDefinition extends SVNode {
+  public variables: SVVariableDefinitionType[];
+  
+  constructor(variables: SVVariableDefinitionType[]) {
+    super("Definition");
+
+    this.variables = variables;
   };
 };
