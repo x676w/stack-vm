@@ -35,6 +35,7 @@ export type SVNodeType = "Literal"
   | "UnaryExpression"
   | "ArrayExpression"
   | "CallExpression"
+  | "MemberExpression"
   | "Identifier"
   | "VariableDefinition";
 
@@ -197,6 +198,18 @@ export class SVCallExpression extends SVNode {
 
     this.callee = callee;
     this.args = args;
+  };
+};
+
+export class SVMemberExpression extends SVNode {
+  public object: SVNode;
+  public property: SVNode;
+  
+  constructor(object: SVNode, property: SVNode) {
+    super("MemberExpression");
+
+    this.object = object;
+    this.property = property;
   };
 };
 

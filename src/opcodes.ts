@@ -51,8 +51,8 @@ const BINARY_BIT_SHIFT_LEFT            = new OperationCode("BINARY_BIT_SHIFT_LEF
 const BINARY_BIT_SHIFT_RIGHT           = new OperationCode("BINARY_BIT_SHIFT_RIGHT");
 const BINARY_BIT_SHIFT_RIGHT_UNSIGNED  = new OperationCode("BINARY_BIT_SHIFT_RIGHT_UNSIGNED");
 const BINARY_BIT_XOR                   = new OperationCode("BINARY_BIT_XOR");
-const BINARY_BIT_AND                   = new OperationCode("BINARY_BIT_AND");
 const BINARY_BIT_OR                    = new OperationCode("BINARY_BIT_OR");
+const BINARY_BIT_AND                   = new OperationCode("BINARY_BIT_AND");
 
 const LOGICAL_OR                       = new OperationCode("LOGICAL_OR");
 const LOGICAL_AND                      = new OperationCode("LOGICAL_AND");
@@ -75,6 +75,8 @@ const BUILD_FUNCTION                   = new OperationCode("BUILD_FUNCTION");
 const JMP                              = new OperationCode("JMP");
 const JMP_IF_TRUE                      = new OperationCode("JMP_IF_TRUE");
 const JMP_IF_FALSE                     = new OperationCode("JMP_IF_FALSE");
+
+const GET_PROPERTY                     = new OperationCode("GET_PROPERTY");
 
 const CALL_FUNCTION                    = new OperationCode("CALL_FUNCTION");
 const CALL_METHOD                      = new OperationCode("CALL_METHOD");
@@ -102,8 +104,8 @@ export default {
   BINARY_BIT_SHIFT_RIGHT,
   BINARY_BIT_SHIFT_RIGHT_UNSIGNED,
   BINARY_BIT_XOR,
-  BINARY_BIT_AND,
   BINARY_BIT_OR,
+  BINARY_BIT_AND,
 
   LOGICAL_OR,
   LOGICAL_AND,
@@ -126,6 +128,8 @@ export default {
   JMP,
   JMP_IF_TRUE,
   JMP_IF_FALSE,
+
+  GET_PROPERTY,
 
   CALL_FUNCTION,
   CALL_METHOD

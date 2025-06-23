@@ -28,10 +28,14 @@
   },
   "homepage": "https://github.com/x676w/StackVM#readme",
   "dependencies": {
+    "@babel/generator": "^7.27.5",
     "@babel/parser": "^7.27.5",
     "@babel/traverse": "^7.27.4",
     "@babel/types": "^7.27.6",
+    "@types/babel__generator": "^7.27.0",
     "@types/babel__traverse": "^7.20.7",
+    "@types/node": "^24.0.3",
+    "terser": "^5.43.1",
     "typescript": "^5.8.3"
   }
 }

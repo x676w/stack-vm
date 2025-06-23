@@ -1,12 +1,13 @@
 import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
-import { SVArrayExpression, SVBinaryExpression, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator, SVCallExpression } from "../parser/nodes";
+import { SVArrayExpression, SVBinaryExpression, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator, SVCallExpression, SVMemberExpression } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
   private program     : number[];
-  private usedOpcodes : number[];
   private scopes      : SVScope[];
+
+  public usedOpcodes : number[];
 
   constructor() {
     this.program     = [];
@@ -102,7 +103,7 @@ class Compiler {
         else if(operator === "^")
           this.writeOp(opcodes.BINARY_BIT_XOR);
         else if(operator === "|")
-          this.writeOp(opcodes.BINARY_BIT_XOR);
+          this.writeOp(opcodes.BINARY_BIT_OR);
         else if(operator === "&")
           this.writeOp(opcodes.BINARY_BIT_AND);
         
@@ -166,11 +167,24 @@ class Compiler {
           this.walkNode(arg);
         };
 
-        if(callee.nodeType === 'Identifier') {
+        if(callee.nodeType === 'MemberExpression') {
+          this.writeOp(opcodes.CALL_METHOD);
+          this.writeInstruction(args.length);
+        } else {
           this.writeOp(opcodes.CALL_FUNCTION);
           this.writeInstruction(args.length);
         };
         
+        break;
+      };
+
+      case "MemberExpression": {
+        const expression = (node as SVMemberExpression);
+
+        this.walkNode(expression.object);
+        this.walkNode(expression.property);
+        this.writeOp(opcodes.GET_PROPERTY);
+
         break;
       };
 
