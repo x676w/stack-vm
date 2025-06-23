@@ -7,7 +7,7 @@ class Compiler {
   private program     : number[];
   private scopes      : SVScope[];
 
-  public usedOpcodes : number[];
+  public usedOpcodes  : number[];
 
   constructor() {
     this.program     = [];
