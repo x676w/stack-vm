@@ -22,13 +22,11 @@ Edit `obfuscate.js`
 ```js
 const obfuscate = require("./dist").default;
 
-const program = obfuscate(`
-  const string = "Hello, World!";
-
-  const string2 = string;
-`);
-
-console.log(program);
+obfuscate(`
+  console.log('Hello, World!');
+`).then((output) => {
+  console.log(output);
+});
 ```
 
 # Supported Features
@@ -36,6 +34,7 @@ console.log(program);
 - Variables	            ✅
 - Logical Expressions	  ✅
 - Unary Expressions	    ✅
+- Call Expressions	    ✅
 - Arrays	              ✅
 - Objects	              ❌​
 - Functions	            ❌​
