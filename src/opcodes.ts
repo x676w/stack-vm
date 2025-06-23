@@ -76,6 +76,9 @@ const JMP                              = new OperationCode("JMP");
 const JMP_IF_TRUE                      = new OperationCode("JMP_IF_TRUE");
 const JMP_IF_FALSE                     = new OperationCode("JMP_IF_FALSE");
 
+const CALL_FUNCTION                    = new OperationCode("CALL_FUNCTION");
+const CALL_METHOD                      = new OperationCode("CALL_METHOD");
+
 export default {
   STACK_PUSH,
   STACK_POP,
@@ -123,4 +126,7 @@ export default {
   JMP,
   JMP_IF_TRUE,
   JMP_IF_FALSE,
+
+  CALL_FUNCTION,
+  CALL_METHOD
 }

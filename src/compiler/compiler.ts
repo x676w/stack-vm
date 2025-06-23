@@ -1,6 +1,6 @@
 import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
-import { SVArrayExpression, SVBinaryExpression, SVDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator } from "../parser/nodes";
+import { SVArrayExpression, SVBinaryExpression, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator, SVCallExpression } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
@@ -158,6 +158,22 @@ class Compiler {
         break;
       };
 
+      case "CallExpression": {
+        const callee = (node as SVCallExpression).callee;
+        const args = (node as SVCallExpression).args;
+
+        for(const arg of args) {
+          this.walkNode(arg);
+        };
+
+        if(callee.nodeType === 'Identifier') {
+          this.writeOp(opcodes.CALL_FUNCTION);
+          this.writeInstruction(args.length);
+        };
+        
+        break;
+      };
+
       case "Identifier": {
         const identifier = (node as SVIdentifier);
 
@@ -183,7 +199,7 @@ class Compiler {
           return;
         };
 
-        if(identifier.global) {
+        if(identifier.isGlobal) {
           this.writeOp(opcodes.LOAD_FROM_GLOBAL);
           this.writeInstruction(identifier.name);
 
@@ -196,8 +212,8 @@ class Compiler {
         break;
       };
 
-      case "Definition": {
-        const definition = node as SVDefinition;
+      case "VariableDefinition": {
+        const definition = node as SVVariableDefinition;
 
         const scope = this.getCurrentScope();
 

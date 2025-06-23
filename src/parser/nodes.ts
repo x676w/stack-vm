@@ -34,8 +34,9 @@ export type SVNodeType = "Literal"
   | "LogicalExpression"
   | "UnaryExpression"
   | "ArrayExpression"
+  | "CallExpression"
   | "Identifier"
-  | "Definition";
+  | "VariableDefinition";
 
 export type SVVariableDefinitionType = {
   name: string,
@@ -187,23 +188,35 @@ export class SVArrayExpression extends SVNode {
   };
 };
 
-export class SVIdentifier extends SVNode {
-  public name: string;
-  public global: boolean;
+export class SVCallExpression extends SVNode {
+  public callee: SVNode;
+  public args: SVNode[];
 
-  constructor(name: string, global?: boolean) {
-    super("Identifier");
+  constructor(callee: SVNode, args: SVNode[]) {
+    super("CallExpression");
 
-    this.name = name;
-    this.global = global ?? false;
+    this.callee = callee;
+    this.args = args;
   };
 };
 
-export class SVDefinition extends SVNode {
+export class SVIdentifier extends SVNode {
+  public name: string;
+  public isGlobal: boolean;
+
+  constructor(name: string, isGlobal: boolean) {
+    super("Identifier");
+
+    this.name = name;
+    this.isGlobal = isGlobal;
+  };
+};
+
+export class SVVariableDefinition extends SVNode {
   public variables: SVVariableDefinitionType[];
   
   constructor(variables: SVVariableDefinitionType[]) {
-    super("Definition");
+    super("VariableDefinition");
 
     this.variables = variables;
   };

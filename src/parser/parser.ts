@@ -1,5 +1,5 @@
 import { Node } from "@babel/types";
-import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType } from "./nodes";
+import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType, SVCallExpression } from "./nodes";
 import { parseCode } from "../utils";
 import traverse from "@babel/traverse";
 
@@ -80,8 +80,25 @@ class Parser {
         break;
       };
 
+      case "CallExpression": {
+        const nodeArgs = [];
+        const args = node.arguments.reverse();
+
+        for(const arg of args) {
+          const node = this.scanNode(arg, false)!;
+
+          nodeArgs.push(node);
+        };
+
+        const callee = this.scanNode(node.callee, true)!;
+
+        svNode = new SVCallExpression(callee, nodeArgs);
+
+        break;
+      };
+
       case "ExpressionStatement": {
-        this.scanNode(node.expression, false);
+        svNode = this.scanNode(node.expression, false);
 
         break;
       };
@@ -106,7 +123,7 @@ class Parser {
           });
         };
 
-        svNode = new SVDefinition(variables);
+        svNode = new SVVariableDefinition(variables);
         
         break;
       };
