@@ -6,7 +6,7 @@ import Compiler from "./compiler/compiler";
 import Parser from "./parser/parser";
 import opcodes from "./opcodes";
 import { minify } from "terser";
-import { parseCode } from "./utils";
+import { parseCode, shuffleArray } from "./utils";
 import { SwitchCase, switchStatement } from "@babel/types";
 
 const interpreterPath = path.resolve(
@@ -71,7 +71,7 @@ async function obfuscate(code: string): Promise<string> {
 
       path.skip();
 
-      path.node.cases.sort(() => Math.random() - 0.5);
+      shuffleArray(path.node.cases);
     }
   });
 
