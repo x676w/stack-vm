@@ -29,6 +29,11 @@ obfuscate(`
 });
 ```
 
+```js
+/* output */
+!function(){let n=0;const e=[102,"console",9,"log",9,"Hello, World!",95,1],o=[];function r(){return e[n++]}function t(){if(!(n>=e.length))return function(){switch(r()){case 9:o.push(r());break;case 102:o.push("undefined"!=typeof window?window[r()]:"undefined"!=typeof global?global[r()]:new Function("return this")()[r()]);break;case 95:for(var n=r(),e=new Array(n),t=0;t<n;t++)e[t]=o.pop();var i=o.pop(),c=o.pop();o.push(c[i].apply(c,e))}}(),!0}for(;t(););}();
+```
+
 # Supported Features
 - Arithmetic	          ✅
 - Variables	            ✅
