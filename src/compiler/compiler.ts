@@ -225,11 +225,14 @@ class Compiler {
             left = expression.left as SVMemberExpression;
             right = expression.right;
 
-            if(left.property.nodeType === 'Identifier') {
+            if(left.property.nodeType === 'Identifier' || left.property.nodeType === 'Literal') {
               this.walkNode(left.object);
               this.writeOp(opcodes.STACK_PUSH);
-              this.writeInstruction((left.property as SVIdentifier).name);
-            } else {
+              this.writeInstruction(
+                left.property.nodeType === 'Literal' ? (left.property as SVLiteral).value
+                : (left.property as SVIdentifier).name
+              )
+            }  else {
               this.walkNode(left);
             };
 

@@ -2,15 +2,19 @@ const obfuscate = require("./dist").default;
 const confuser = require("js-confuser");
 
 obfuscate(`
-  const onload = console.log.bind(console, 'Script loaded');
+  const array = [];
 
-  const script = document.createElement('script');
-
-  script.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+  array.push(1);
+  array.push(2);
+  array.push(3);
+  array.push(4);
+  array.push(5);
   
-  script.onload = onload;
+  console.log(array);
 
-  document.body.appendChild(script);
+  array[0] = 10;
+
+  console.log(array, array.length);
 `).then(async (interpreter) => {
   interpreter = (await confuser.obfuscate(interpreter, {
     target: 'browser',
