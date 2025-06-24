@@ -107,6 +107,15 @@ class Parser {
         break;
       };
 
+      case "MemberExpression": {
+        const object = this.scanNode(node.object, false)!;
+        const property = this.scanNode(node.property, false)!;
+
+        svNode = new SVMemberExpression(object, property);
+        
+        break;
+      };
+
       case "ExpressionStatement": {
         svNode = this.scanNode(node.expression, false);
 

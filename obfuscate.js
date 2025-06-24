@@ -1,29 +1,13 @@
 const obfuscate = require("./dist").default;
 
 obfuscate(`
-  const number1 = 100;
-  const number2 = 200;
+  const className = 'my-button';
 
-  console.log(typeof number1 === 'number');
-  console.log(typeof number2 === 'number');
+  const button = document.createElement('button');
 
-  console.log(number1 + number2);
-  console.log(number1 - number2);
-  console.log(number1 * number2);
-  console.log(number1 / number2);
-  console.log(number1 % number2);
-  console.log(number1 < number2);
-  console.log(number1 <= number2);
-  console.log(number1 > number2);
-  console.log(number1 >= number2);
-  console.log(number1 == number2);
-  console.log(number1 === number2);
-  console.log(number1 != number2);
-  console.log(number1 !== number2);
-  console.log(number1 << number2);
-  console.log(number1 >> number2);
-  console.log(number1 >>> number2);
-  console.log(number1 ^ number2);
-  console.log(number1 & number2);
-  console.log(number1 | number2);
+  button.classList.add(className);
+
+  document.body.appendChild(button);
+
+  console.log('Appended button with class:', className);
 `).then(console.log);
