@@ -199,6 +199,10 @@ class Compiler {
 
         const left = expression.left as SVIdentifier;
         const right = expression.right;
+        const operator = expression.operator;
+
+        if(operator !== '=')
+          return;
 
         const scope = this.getCurrentScope();
 
