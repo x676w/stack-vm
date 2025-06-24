@@ -1,11 +1,13 @@
 const obfuscate = require("./dist").default;
 
 obfuscate(`
-  var name = 'John';
+  const onload = console.log.bind(console, 'Script loaded');
 
-  console.log(name);
+  const script = document.createElement('script');
 
-  var name = 'Alex';
+  script.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+  
+  script.onload = onload;
 
-  console.log(name);
+  document.body.appendChild(script);
 `).then(console.log);

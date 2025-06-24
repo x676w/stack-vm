@@ -167,6 +167,15 @@
 
         stack.push(object[key]);
         break;
+      case __SET_PROPERTY__:
+        var value = stack.pop();
+        var key = stack.pop();
+        var object = stack.pop();
+
+        object[key] = value;
+
+        stack.push(object);
+        break;
       case __CALL_FUNCTION__:
         var argsLength = readInstruction();
         var args = new Array(argsLength);

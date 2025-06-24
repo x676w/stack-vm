@@ -48,15 +48,20 @@ export type SVNodeType = "Literal"
   | "Identifier"
   | "VariableDefinition";
 
+  
+export type SVScopeDefinitionKindType = "let"
+  | "var"
+  | "const";
+
+export type SVAssignmentType = "identifier"
+  | "property";
+
 export type SVVariableDefinitionType = {
   name: string,
   kind: SVScopeDefinitionKindType,
   constant: boolean,
   value: SVNode | undefined
 };
-
-export type SVScopeDefinitionKindType = "let" | "var" | "const";
-  
 export class SVScopeDefinition {
   public id: number;
   public kind: SVScopeDefinitionKindType;
@@ -233,7 +238,7 @@ export class SVAssignmentExpression extends SVNode {
   public left: SVNode;
   public right: SVNode;
   public operator: SVAssignmentOperator;
-  public isIdentifierAssignment: boolean;
+  public assignmentType: SVAssignmentType;
   
   constructor(left: SVNode, right: SVNode, operator: SVAssignmentOperator) {
     super("AssignmentExpression");
@@ -241,7 +246,7 @@ export class SVAssignmentExpression extends SVNode {
     this.left = left;
     this.right = right;
     this.operator = operator;
-    this.isIdentifierAssignment = this.left.nodeType === 'Identifier';
+    this.assignmentType = this.left.nodeType === 'MemberExpression' ? 'property' : 'identifier';
   };
 };
 

@@ -194,26 +194,53 @@ class Compiler {
          */
         const expression = (node as SVAssignmentExpression);
 
-        if(!expression.isIdentifierAssignment)
-          return;
+        let left;
+        let right;
 
-        const left = expression.left as SVIdentifier;
-        const right = expression.right;
         const operator = expression.operator;
 
         if(operator !== '=')
           return;
 
-        const scope = this.getCurrentScope();
+        switch(expression.assignmentType) {
+          case 'identifier': {
+            left = expression.left as SVIdentifier;
+            right = expression.right;
 
-        if(scope.hasVariableInParentRoot(left.name)) {
-          const definition = scope.getVariableInParentRoot(left.name);
+            const scope = this.getCurrentScope();
 
-          this.walkNode(right);
-          this.writeOp(opcodes.ASSIGN_VARIABLE);    
-          this.writeInstruction(definition.scope.id);
-          this.writeInstruction(definition.id);
+            if(scope.hasVariableInParentRoot(left.name)) {
+              const definition = scope.getVariableInParentRoot(left.name);
+
+              this.walkNode(right);
+              this.writeOp(opcodes.ASSIGN_VARIABLE);    
+              this.writeInstruction(definition.scope.id);
+              this.writeInstruction(definition.id);
+            };
+
+            break;
+          };
+          
+          case 'property': {
+            left = expression.left as SVMemberExpression;
+            right = expression.right;
+
+            if(left.property.nodeType === 'Identifier') {
+              this.walkNode(left.object);
+              this.writeOp(opcodes.STACK_PUSH);
+              this.writeInstruction((left.property as SVIdentifier).name);
+            } else {
+              this.walkNode(left);
+            };
+
+            this.walkNode(right);
+
+            this.writeOp(opcodes.SET_PROPERTY);
+            
+            break;
+          };
         };
+        
         
         break;
       };

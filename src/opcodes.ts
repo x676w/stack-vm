@@ -78,6 +78,7 @@ const JMP_IF_TRUE                      = new OperationCode("JMP_IF_TRUE");
 const JMP_IF_FALSE                     = new OperationCode("JMP_IF_FALSE");
 
 const GET_PROPERTY                     = new OperationCode("GET_PROPERTY");
+const SET_PROPERTY                     = new OperationCode("SET_PROPERTY");
 
 const CALL_FUNCTION                    = new OperationCode("CALL_FUNCTION");
 const CALL_METHOD                      = new OperationCode("CALL_METHOD");
@@ -132,6 +133,7 @@ export default {
   JMP_IF_FALSE,
 
   GET_PROPERTY,
+  SET_PROPERTY,
 
   CALL_FUNCTION,
   CALL_METHOD
