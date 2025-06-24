@@ -1,5 +1,5 @@
 import { Node } from "@babel/types";
-import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType, SVCallExpression, SVMemberExpression, SVAssignmentOperator, SVAssignmentExpression } from "./nodes";
+import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType, SVCallExpression, SVMemberExpression, SVAssignmentOperator, SVAssignmentExpression, SVScopeDefinitionKindType } from "./nodes";
 import { parseCode } from "../utils";
 import traverse from "@babel/traverse";
 
@@ -147,6 +147,7 @@ class Parser {
 
           variables.push({
             name: declarator.id.name,
+            kind: node.kind as SVScopeDefinitionKindType,
             constant: node.kind === "const",
             value: declarator.init ? this.scanNode(declarator.init, false) : undefined
           });

@@ -264,7 +264,7 @@ class Compiler {
             this.writeInstruction(undefined);
 
           const definition = scope.defineVariable(
-            variable.name, variable.constant
+            variable.name, variable.kind, variable.constant
           );
 
           this.writeOp(

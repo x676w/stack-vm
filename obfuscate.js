@@ -1,11 +1,11 @@
 const obfuscate = require("./dist").default;
 
 obfuscate(`
-  let name = 'John';
+  var name = 'John';
 
   console.log(name);
 
-  name = 'Alex';
+  var name = 'Alex';
 
   console.log(name);
 `).then(console.log);

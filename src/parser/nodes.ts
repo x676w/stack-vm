@@ -50,18 +50,22 @@ export type SVNodeType = "Literal"
 
 export type SVVariableDefinitionType = {
   name: string,
+  kind: SVScopeDefinitionKindType,
   constant: boolean,
   value: SVNode | undefined
-}
+};
 
+export type SVScopeDefinitionKindType = "let" | "var" | "const";
   
 export class SVScopeDefinition {
   public id: number;
+  public kind: SVScopeDefinitionKindType;
   public constant: boolean;
   public scope: SVScope;
   
-  constructor(id: number, constant: boolean, scope: SVScope) {
+  constructor(id: number, kind: SVScopeDefinitionKindType, constant: boolean, scope: SVScope) {
     this.id = id;
+    this.kind = kind;
     this.constant = constant;
     this.scope = scope;
   };
@@ -103,13 +107,16 @@ export class SVScope {
       throw new Error(name + " is not defined.");
   };
 
-  public defineVariable(name: string, constant: boolean) {
+  public defineVariable(name: string, kind: SVScopeDefinitionKindType, constant: boolean) {
     const isDefined = this.variables.has(name);
 
-    assert(!isDefined, name + " is already defined.");
+    assert(
+      !isDefined || kind === "var",
+      name + " is already defined."
+    );
 
     const definition = new SVScopeDefinition(
-      this.variables.size, constant, this
+      this.variables.size, kind, constant, this
     );
 
     this.variables.set(name, definition);
