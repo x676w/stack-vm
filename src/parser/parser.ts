@@ -1,5 +1,5 @@
 import { Node } from "@babel/types";
-import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType, SVCallExpression, SVMemberExpression } from "./nodes";
+import { SVArrayExpression, SVBinaryExpression, SVBinaryOperator, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVLogicalOperator, SVNode, SVUnaryExpression, SVUnaryOperator, SVVariableDefinitionType, SVCallExpression, SVMemberExpression, SVAssignmentOperator, SVAssignmentExpression } from "./nodes";
 import { parseCode } from "../utils";
 import traverse from "@babel/traverse";
 
@@ -112,6 +112,16 @@ class Parser {
         const property = this.scanNode(node.property, false)!;
 
         svNode = new SVMemberExpression(object, property);
+        
+        break;
+      };
+
+      case "AssignmentExpression": {
+        const left = this.scanNode(node.left, false)!;
+        const right = this.scanNode(node.right, false)!;
+        const operator = node.operator as SVAssignmentOperator;
+
+        svNode = new SVAssignmentExpression(left, right, operator);
         
         break;
       };

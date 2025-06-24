@@ -29,6 +29,14 @@ export type SVUnaryOperator = "+"
   | "~"
   | "typeof";
 
+export type SVAssignmentOperator = "="
+  | "+="
+  | "-="
+  | "*="
+  | "/="
+  | "%="
+  | "**=";
+
 export type SVNodeType = "Literal"
   | "BinaryExpression"
   | "LogicalExpression"
@@ -36,6 +44,7 @@ export type SVNodeType = "Literal"
   | "ArrayExpression"
   | "CallExpression"
   | "MemberExpression"
+  | "AssignmentExpression"
   | "Identifier"
   | "VariableDefinition";
 
@@ -210,6 +219,22 @@ export class SVMemberExpression extends SVNode {
 
     this.object = object;
     this.property = property;
+  };
+};
+
+export class SVAssignmentExpression extends SVNode {
+  public left: SVNode;
+  public right: SVNode;
+  public operator: SVAssignmentOperator;
+  public isIdentifierAssignment: boolean;
+  
+  constructor(left: SVNode, right: SVNode, operator: SVAssignmentOperator) {
+    super("AssignmentExpression");
+    
+    this.left = left;
+    this.right = right;
+    this.operator = operator;
+    this.isIdentifierAssignment = this.left.nodeType === 'Identifier';
   };
 };
 

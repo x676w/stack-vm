@@ -1,6 +1,6 @@
 import opcodes from "../opcodes";
 import { IOperationCode } from "../opcodes";
-import { SVArrayExpression, SVBinaryExpression, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator, SVCallExpression, SVMemberExpression } from "../parser/nodes";
+import { SVArrayExpression, SVBinaryExpression, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator, SVCallExpression, SVMemberExpression, SVAssignmentExpression } from "../parser/nodes";
 import { TNodesRoot } from "../parser/parser";
 
 class Compiler {
@@ -187,6 +187,32 @@ class Compiler {
 
         break;
       };
+      
+      case "AssignmentExpression": {
+        /**
+         * Currently supports only identifier assignemnts
+         */
+        const expression = (node as SVAssignmentExpression);
+
+        if(!expression.isIdentifierAssignment)
+          return;
+
+        const left = expression.left as SVIdentifier;
+        const right = expression.right;
+
+        const scope = this.getCurrentScope();
+
+        if(scope.hasVariableInParentRoot(left.name)) {
+          const definition = scope.getVariableInParentRoot(left.name);
+
+          this.walkNode(right);
+          this.writeOp(opcodes.ASSIGN_VARIABLE);    
+          this.writeInstruction(definition.scope.id);
+          this.writeInstruction(definition.id);
+        };
+        
+        break;
+      };
 
       case "Identifier": {
         const identifier = (node as SVIdentifier);
@@ -197,7 +223,7 @@ class Compiler {
           const definition = scope.getVariable(identifier.name);
 
           this.writeOp(opcodes.LOAD_FROM_SCOPE);
-          this.writeInstruction(scope.id);
+          this.writeInstruction(definition.scope.id);
           this.writeInstruction(definition.id);
         
           return;
@@ -207,7 +233,7 @@ class Compiler {
           const definition = scope.getVariableInParentRoot(identifier.name);
           
           this.writeOp(opcodes.LOAD_FROM_SCOPE);
-          this.writeInstruction(scope.id);
+          this.writeInstruction(definition.scope.id);
           this.writeInstruction(definition.id);
           
           return;

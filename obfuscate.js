@@ -1,13 +1,11 @@
 const obfuscate = require("./dist").default;
 
 obfuscate(`
-  const className = 'my-button';
+  let name = 'John';
 
-  const button = document.createElement('button');
+  console.log(name);
 
-  button.classList.add(className);
+  name = 'Alex';
 
-  document.body.appendChild(button);
-
-  console.log('Appended button with class:', className);
+  console.log(name);
 `).then(console.log);

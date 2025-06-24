@@ -131,6 +131,13 @@
       case __LOAD_FROM_GLOBAL__:
         stack.push(typeof window !== 'undefined' ? window[readInstruction()] : typeof global !== 'undefined' ? global[readInstruction()] : new Function('return this')()[readInstruction()]);
         break;
+      case __ASSIGN_VARIABLE__:
+        var value = stack.pop();
+        var scopeId = readInstruction();
+        var definitionId = readInstruction();
+
+        scopes[scopeId][definitionId] = value;
+        break;
       case __BUILD_ARRAY__:
         var arrayLength = readInstruction();
         var array = new Array(arrayLength);
