@@ -88,9 +88,7 @@
         var scopeId = readInstruction();
         var definitionId = readInstruction();
     
-        if(scopes[scopeId] === undefined) {
-          scopes[scopeId] = {};
-        };
+        scopes[scopeId] ??= {};
 
         scopes[scopeId][definitionId] = value;
 
@@ -191,6 +189,25 @@
         var object = stack.pop();
 
         stack.push(object[key].apply(object, args));
+        break;
+      case __JMP__:
+        var newPointer = readInstruction();
+
+        pointer = newPointer;
+        break;
+      case __JMP_IF_TRUE__:
+        var newPointer = readInstruction();
+        var condition  = stack.pop();
+
+        if(condition)
+          pointer = newPointer;
+        break;
+      case __JMP_IF_FALSE__:
+        var newPointer = readInstruction();
+        var condition  = stack.pop();
+
+        if(!condition)
+          pointer = newPointer;
         break;
     };
   };

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import traverse from "@babel/traverse";
 import generate from "@babel/generator";
-import Compiler from "./compiler/compiler.js";
+import SVCompiler from "./compiler/compiler.js";
 import opcodes from "./opcodes.js";
 import { minify } from "terser";
 import { parseCode, shuffleArray } from "./utils.js";
@@ -15,7 +15,7 @@ const interpreterPath = path.resolve(
 async function obfuscate(source: string): Promise<string> {
   let interpreter = fs.readFileSync(interpreterPath, "utf8");
 
-  const compiler = new Compiler();
+  const compiler = new SVCompiler();
   
   const program = compiler.compile(source);
 

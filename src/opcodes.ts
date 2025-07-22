@@ -75,6 +75,10 @@ const SET_PROPERTY                     = new OperationCode("SET_PROPERTY");
 const CALL_FUNCTION                    = new OperationCode("CALL_FUNCTION");
 const CALL_METHOD                      = new OperationCode("CALL_METHOD");
 
+const JMP                              = new OperationCode("JMP");
+const JMP_IF_TRUE                      = new OperationCode("JMP_IF_TRUE");
+const JMP_IF_FALSE                     = new OperationCode("JMP_IF_FALSE");
+
 export default {
   STACK_PUSH,
   STACK_POP,
@@ -120,5 +124,9 @@ export default {
   SET_PROPERTY,
 
   CALL_FUNCTION,
-  CALL_METHOD
+  CALL_METHOD,
+
+  JMP,
+  JMP_IF_TRUE,
+  JMP_IF_FALSE,
 }

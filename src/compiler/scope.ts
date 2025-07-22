@@ -1,21 +1,21 @@
 import { assert } from "../utils.js";
 
-export class SVScopeDefinition {
+export class ScopeDefinition {
   public id: number;
-  public scope: SVScope;
+  public scope: ScopeImitator;
   
-  constructor(id: number, scope: SVScope) {
+  constructor(id: number, scope: ScopeImitator) {
     this.id = id;
     this.scope = scope;
   };
 };
 
-export class SVScope {
+export class ScopeImitator {
   public id: number;
-  public parent: SVScope | null;
-  public variables: Map<string, SVScopeDefinition>;
+  public parent: ScopeImitator | null;
+  public variables: Map<string, ScopeDefinition>;
   
-  constructor(id: number, parent?: SVScope) {
+  constructor(id: number, parent?: ScopeImitator) {
     this.id = id;
     this.parent = parent ?? null;
     this.variables = new Map();
@@ -37,7 +37,7 @@ export class SVScope {
     return definition!;
   };
 
-  public getVariableFromRoot(name: string): SVScopeDefinition {
+  public getVariableFromRoot(name: string): ScopeDefinition {
     if(this.hasVariable(name))
       return this.getVariable(name);
     else if(this.parent)
@@ -54,7 +54,7 @@ export class SVScope {
       name + " is already defined."
     );
 
-    const definition = new SVScopeDefinition(
+    const definition = new ScopeDefinition(
       this.variables.size, this
     );
 

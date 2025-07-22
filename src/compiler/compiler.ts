@@ -1,18 +1,19 @@
 import * as types from "@babel/types";
 import opcodes, { type IOperationCode } from "../opcodes.js";
-import { SVScope } from "./scope.js";
+import { ScopeImitator } from "./scope.js";
 import { getGlobals, parseCode } from "../utils.js";
+import JMPLabel from "./jmp-label.js";
 
-class Compiler {
+export default class SVCompiler {
   private program      : number[];
-  private currentScope : SVScope;
+  private currentScope : ScopeImitator;
   private globals      : Set<string>;
 
   public usedOpcodes   : number[];
 
   constructor() {
     this.program      = [];
-    this.currentScope = new SVScope(0);
+    this.currentScope = new ScopeImitator(0);
     this.globals      = new Set();
 
     this.usedOpcodes  = [];
@@ -21,7 +22,7 @@ class Compiler {
   private enterNewScope() {
     const parent = this.currentScope;
 
-    const newScope = new SVScope(parent.id + 1, parent);
+    const newScope = new ScopeImitator(parent.id + 1, parent);
 
     this.currentScope = newScope;
   };
@@ -208,16 +209,6 @@ class Compiler {
       };
       
       case "Identifier": {
-        if(this.currentScope.hasVariable(node.name)) {
-          const definition = this.currentScope.getVariable(node.name);
-
-          this.writeOp(opcodes.LOAD_FROM_SCOPE);
-          this.writeInstruction(definition.scope.id);
-          this.writeInstruction(definition.id);
-        
-          return;
-        };
-        
         if(this.currentScope.hasVariableFromRoot(node.name)) {
           const definition = this.currentScope.getVariableFromRoot(node.name);
           
@@ -252,18 +243,36 @@ class Compiler {
       case "VariableDeclarator": {
         if(node.id.type !== 'Identifier') return;
         
-        const scope = this.currentScope;
-
         if(node.init)
           this.walkNode(node.init)
         else
           this.writeInstruction(undefined);
 
-        const definition = scope.defineVariable(node.id.name);
+        const definition = this.currentScope.defineVariable(node.id.name);
 
         this.writeOp(opcodes.STORE_VARIABLE);
-        this.writeInstruction(scope.id);
+        this.writeInstruction(definition.scope.id);
         this.writeInstruction(definition.id);
+        
+        break;
+      };
+
+      case "IfStatement": {
+        this.walkNode(node.test);
+
+        const label = new JMPLabel();
+
+        label.init(this, node.consequent);
+
+        const pointers = label.getPointers(this.program);
+
+        this.writeOp(opcodes.JMP_IF_FALSE);
+
+        const jmpIfFalsePointer = pointers.exit + 1;
+
+        this.writeInstruction(jmpIfFalsePointer);
+
+        this.program = label.link(this.program);
         
         break;
       };
@@ -296,6 +305,22 @@ class Compiler {
     };
   };
 
+  public compileNodes(...nodes: types.Node[]) {
+    const oldProgram = this.program;
+    this.program     = [];
+
+    for(let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+
+      this.walkNode(node);
+    };
+
+    const newProgram = this.program;
+    this.program = oldProgram;
+
+    return newProgram;
+  };
+
   public compile(source: string) {
     const tree = parseCode(source);
 
@@ -308,5 +333,3 @@ class Compiler {
     return this.program;
   };
 };
-
-export default Compiler;

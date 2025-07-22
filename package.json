@@ -1,6 +1,6 @@
 {
   "name": "stackvm",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "javascript code obfuscator based on stack virtual machine virtualization",
   "keywords": [
     "stackvm",
