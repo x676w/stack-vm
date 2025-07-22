@@ -1,22 +1,24 @@
 {
   "name": "stackvm",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "javascript code obfuscator based on stack virtual machine virtualization",
   "keywords": [
     "stackvm",
+    "stack-vm",
     "jsvm",
-    "virtualizator",
+    "vm",
     "obfuscator",
     "protector",
-    "virtual-machine",
-    "javascript-virtual-machine"
+    "obfuscation",
+    "protection",
+    "virtualization"
   ],
   "license": "UNLICENSED",
   "author": "x676w",
-  "type": "commonjs",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "start": "npx tsc && node obfuscate.js",
+    "start": "tsx obfuscate.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,16 +29,15 @@
     "url": "https://github.com/x676w/StackVM/issues"
   },
   "homepage": "https://github.com/x676w/StackVM#readme",
-  "dependencies": {
-    "@babel/generator": "^7.27.5",
-    "@babel/parser": "^7.27.5",
-    "@babel/traverse": "^7.27.4",
-    "@babel/types": "^7.27.6",
+  "devDependencies": {
+    "@babel/generator": "^7.28.0",
+    "@babel/parser": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
+    "@babel/types": "^7.28.1",
     "@types/babel__generator": "^7.27.0",
     "@types/babel__traverse": "^7.20.7",
-    "@types/node": "^24.0.3",
-    "js-confuser": "^2.0.0",
-    "terser": "^5.43.1",
+    "@types/node": "^24.1.0",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }

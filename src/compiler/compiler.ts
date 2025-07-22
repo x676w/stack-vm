@@ -1,18 +1,35 @@
-import opcodes from "../opcodes";
-import { IOperationCode } from "../opcodes";
-import { SVArrayExpression, SVBinaryExpression, SVVariableDefinition, SVIdentifier, SVLiteral, SVLogicalExpression, SVNode, SVScope, SVUnaryExpression, SVUnaryOperator, SVCallExpression, SVMemberExpression, SVAssignmentExpression } from "../parser/nodes";
-import { TNodesRoot } from "../parser/parser";
+import * as types from "@babel/types";
+import opcodes, { type IOperationCode } from "../opcodes.js";
+import { SVScope } from "./scope.js";
+import { getGlobals, parseCode } from "../utils.js";
 
 class Compiler {
-  private program     : number[];
-  private scopes      : SVScope[];
+  private program      : number[];
+  private currentScope : SVScope;
+  private globals      : Set<string>;
 
-  public usedOpcodes  : number[];
+  public usedOpcodes   : number[];
 
   constructor() {
-    this.program     = [];
-    this.usedOpcodes = [];
-    this.scopes      = [new SVScope(0)];
+    this.program      = [];
+    this.currentScope = new SVScope(0);
+    this.globals      = new Set();
+
+    this.usedOpcodes  = [];
+  };
+
+  private enterNewScope() {
+    const parent = this.currentScope;
+
+    const newScope = new SVScope(parent.id + 1, parent);
+
+    this.currentScope = newScope;
+  };
+
+  private exitScope() {
+    const outerScope = this.currentScope.parent!;
+
+    this.currentScope = outerScope;
   };
 
   private writeInstruction(instruction: any) {
@@ -31,229 +48,164 @@ class Compiler {
     };
   };
 
-  private getCurrentScope() {
-    return this.scopes[this.scopes.length - 1];
-  };
-
-  private pushScope() {
-    const parent = this.getCurrentScope();
-
-    const newScope = new SVScope(
-      parent.id, parent
-    );
-
-    this.scopes.push(newScope);
-  };
-
-  private popScope() {
-    return this.scopes.length > 1 ? this.scopes.pop()! : this.scopes[this.scopes.length - 1];
-  };
-
-  private walkNode(node: SVNode) {
-    switch(node.nodeType) {
-      case "Literal": {
-        const arg = (node as SVLiteral).value;
-
+  private walkNode(node: types.Node) {
+    switch(node.type) {
+      case "StringLiteral":
+      case "NumericLiteral":
+      case "BooleanLiteral": {
         this.writeOp(opcodes.STACK_PUSH);
-        this.writeInstruction(arg);
+        this.writeInstruction(node.value);
 
+        break;
+      };
+
+      case "NullLiteral": {
+        this.writeOp(opcodes.STACK_PUSH);
+        this.writeInstruction(null);
+        
         break;
       };
 
       case "BinaryExpression": {
-        const right = (node as SVBinaryExpression).right;
-        const left = (node as SVBinaryExpression).left;
-        const operator = (node as SVBinaryExpression).operator;
+        this.walkNode(node.left);
+        this.walkNode(node.right);
+
+        switch(node.operator) {
+          case "+":
+            this.writeOp(opcodes.BINARY_ADD);
+            break;
+          case "-":
+            this.writeOp(opcodes.BINARY_SUB);
+            break;
+          case "*":
+            this.writeOp(opcodes.BINARY_MUL);
+            break;
+          case "/":
+            this.writeOp(opcodes.BINARY_DIV);
+            break;
+          case "%":
+            this.writeOp(opcodes.BINARY_MOD);
+            break;
+          case "<":
+            this.writeOp(opcodes.BINARY_LESS);
+            break;
+          case "<=":
+            this.writeOp(opcodes.BINARY_LESS_OR_EQUAL);
+            break;
+          case ">":
+            this.writeOp(opcodes.BINARY_GREATER);
+            break;
+          case ">=":
+            this.writeOp(opcodes.BINARY_GREATER_OR_EQUAL);
+            break;
+          case "==":
+            this.writeOp(opcodes.BINARY_EQUAL);
+            break;
+          case "===":
+            this.writeOp(opcodes.BINARY_STRICT_EQUAL);
+            break;
+          case "!=":
+            this.writeOp(opcodes.BINARY_NOT_EQUAL);
+            break;
+          case "!==":
+            this.writeOp(opcodes.BINARY_STRICT_NOT_EQUAL);
+            break;
+          case "<<":
+            this.writeOp(opcodes.BINARY_BIT_SHIFT_LEFT);
+            break;
+          case ">>":
+            this.writeOp(opcodes.BINARY_BIT_SHIFT_RIGHT);
+            break;
+          case ">>>":
+            this.writeOp(opcodes.BINARY_BIT_SHIFT_RIGHT_UNSIGNED);
+            break;
+          case "^":
+            this.writeOp(opcodes.BINARY_BIT_XOR);
+            break;
+          case "|":
+            this.writeOp(opcodes.BINARY_BIT_OR);
+            break;
+          case "&":
+            this.writeOp(opcodes.BINARY_BIT_AND);
+            break;
+        };
         
-        this.walkNode(right);
-        this.walkNode(left);
-
-        if(operator === "+")
-          this.writeOp(opcodes.BINARY_ADD);
-        else if(operator === "-")
-          this.writeOp(opcodes.BINARY_SUB);
-        else if(operator === "*")
-          this.writeOp(opcodes.BINARY_MUL);
-        else if(operator === "/")
-          this.writeOp(opcodes.BINARY_DIV);
-        else if(operator === "%")
-          this.writeOp(opcodes.BINARY_MOD);
-        else if(operator === "<")
-          this.writeOp(opcodes.BINARY_LESS);
-        else if(operator === "<=")
-          this.writeOp(opcodes.BINARY_LESS_OR_EQUAL);
-        else if(operator === ">")
-          this.writeOp(opcodes.BINARY_GREATER);
-        else if(operator === ">=")
-          this.writeOp(opcodes.BINARY_GREATER_OR_EQUAL);
-        else if(operator === "==")
-          this.writeOp(opcodes.BINARY_EQUAL);
-        else if(operator === "===")
-          this.writeOp(opcodes.BINARY_STRICT_EQUAL);
-        else if(operator === "!=")
-          this.writeOp(opcodes.BINARY_NOT_EQUAL);
-        else if(operator === "!==")
-          this.writeOp(opcodes.BINARY_STRICT_NOT_EQUAL);
-        else if(operator === "<<")
-          this.writeOp(opcodes.BINARY_BIT_SHIFT_LEFT);
-        else if(operator === ">>")
-          this.writeOp(opcodes.BINARY_BIT_SHIFT_RIGHT);
-        else if(operator === ">>>")
-          this.writeOp(opcodes.BINARY_BIT_SHIFT_RIGHT_UNSIGNED);
-        else if(operator === "^")
-          this.writeOp(opcodes.BINARY_BIT_XOR);
-        else if(operator === "|")
-          this.writeOp(opcodes.BINARY_BIT_OR);
-        else if(operator === "&")
-          this.writeOp(opcodes.BINARY_BIT_AND);
-        
-        break;
-      };
-
-      case "LogicalExpression": {
-        const right = (node as SVLogicalExpression).right;
-        const left = (node as SVLogicalExpression).left;
-        const operator = (node as SVLogicalExpression).operator;
-
-        this.walkNode(right);
-        this.walkNode(left);
-        
-        if(operator === "||")
-          this.writeOp(opcodes.LOGICAL_OR);
-        else if(operator === "&&")
-          this.writeOp(opcodes.LOGICAL_AND);
-
         break;
       };
 
       case "UnaryExpression": {
-        const arg = (node as SVUnaryExpression).arg;
-        const operator = (node as SVUnaryExpression).operator;
-
-        this.walkNode(arg);
+        this.walkNode(node.argument);
         
-        if(operator === "+")
-          this.writeOp(opcodes.UNARY_PLUS);
-        else if(operator === "-")
-          this.writeOp(opcodes.UNARY_MINUS);
-        else if(operator === "!")
-          this.writeOp(opcodes.UNARY_NOT);
-        else if(operator === "~")
-          this.writeOp(opcodes.UNARY_BIT_NOT);
-        else if(operator === "typeof")
-          this.writeOp(opcodes.UNARY_TYPEOF);
+        switch(node.operator) {
+          case "+":
+            this.writeOp(opcodes.UNARY_PLUS);
+            break;
+          case "-":
+            this.writeOp(opcodes.UNARY_MINUS);
+            break;
+          case "!":
+            this.writeOp(opcodes.UNARY_NOT);
+            break;
+          case "~":
+            this.writeOp(opcodes.UNARY_BIT_NOT);
+            break;
+        };
         
         break;
       };
 
       case "ArrayExpression": {
-        const elements = (node as SVArrayExpression).elements;
-
-        for(const element of elements) {
-          this.walkNode(element);
+        for(const element of node.elements) {
+          this.walkNode(element as types.Node);
         };
 
         this.writeOp(opcodes.BUILD_ARRAY);
-        this.writeInstruction(elements.length);
+        this.writeInstruction(node.elements.length);
         
         break;
       };
 
       case "CallExpression": {
-        const callee = (node as SVCallExpression).callee;
-        const args = (node as SVCallExpression).args;
+        let op;
+
+        if(node.callee.type === 'MemberExpression') {
+          this.walkNode(node.callee.object);
+          this.walkNode(node.callee.property);
+          op = opcodes.CALL_METHOD;
+        } else {
+          this.walkNode(node.callee);
+          op = opcodes.CALL_FUNCTION;
+        };
+
+        const args = node.arguments.reverse();
 
         for(const arg of args) {
           this.walkNode(arg);
         };
 
-        if(callee.nodeType === 'MemberExpression') {
-          this.writeOp(opcodes.CALL_METHOD);
-          this.writeInstruction(args.length);
-        } else {
-          this.writeOp(opcodes.CALL_FUNCTION);
-          this.writeInstruction(args.length);
-        };
+        this.writeOp(op);
+        this.writeInstruction(args.length);
         
         break;
       };
 
       case "MemberExpression": {
-        const expression = (node as SVMemberExpression);
+        this.walkNode(node.object);
 
-        this.walkNode(expression.object);
-        this.walkNode(expression.property);
+        if(node.property.type === 'Identifier' && !node.computed) {
+          this.walkNode(types.stringLiteral(node.property.name));
+        } else {
+          this.walkNode(node.property);
+        };
+
         this.writeOp(opcodes.GET_PROPERTY);
 
         break;
       };
       
-      case "AssignmentExpression": {
-        /**
-         * Currently supports only identifier assignemnts
-         */
-        const expression = (node as SVAssignmentExpression);
-
-        let left;
-        let right;
-
-        const operator = expression.operator;
-
-        if(operator !== '=')
-          return;
-
-        switch(expression.assignmentType) {
-          case 'identifier': {
-            left = expression.left as SVIdentifier;
-            right = expression.right;
-
-            const scope = this.getCurrentScope();
-
-            if(scope.hasVariableInParentRoot(left.name)) {
-              const definition = scope.getVariableInParentRoot(left.name);
-
-              this.walkNode(right);
-              this.writeOp(opcodes.ASSIGN_VARIABLE);    
-              this.writeInstruction(definition.scope.id);
-              this.writeInstruction(definition.id);
-            };
-
-            break;
-          };
-          
-          case 'property': {
-            left = expression.left as SVMemberExpression;
-            right = expression.right;
-
-            this.walkNode(left.object);
-            this.writeOp(opcodes.STACK_PUSH);
-
-            if(left.property.nodeType === 'Literal')
-              this.writeInstruction((left.property as SVLiteral).value)
-            else if(left.property.nodeType === 'Identifier')
-              this.writeInstruction((left.property as SVIdentifier).name)
-            else
-              this.walkNode(left);
-
-            this.walkNode(right);
-
-            this.writeOp(opcodes.SET_PROPERTY);
-            
-            break;
-          };
-        };
-        
-        
-        break;
-      };
-
       case "Identifier": {
-        const identifier = (node as SVIdentifier);
-
-        const scope = this.getCurrentScope();
-
-        if(scope.hasVariable(identifier.name)) {
-          const definition = scope.getVariable(identifier.name);
+        if(this.currentScope.hasVariable(node.name)) {
+          const definition = this.currentScope.getVariable(node.name);
 
           this.writeOp(opcodes.LOAD_FROM_SCOPE);
           this.writeInstruction(definition.scope.id);
@@ -262,8 +214,8 @@ class Compiler {
           return;
         };
         
-        if(scope.hasVariableInParentRoot(identifier.name)) {
-          const definition = scope.getVariableInParentRoot(identifier.name);
+        if(this.currentScope.hasVariableFromRoot(node.name)) {
+          const definition = this.currentScope.getVariableFromRoot(node.name);
           
           this.writeOp(opcodes.LOAD_FROM_SCOPE);
           this.writeInstruction(definition.scope.id);
@@ -272,49 +224,80 @@ class Compiler {
           return;
         };
 
-        if(identifier.isGlobal) {
+        if(this.globals.has(node.name)) {
           this.writeOp(opcodes.LOAD_FROM_GLOBAL);
-          this.writeInstruction(identifier.name);
+          this.writeInstruction(node.name);
 
           return;
         };
 
         this.writeOp(opcodes.STACK_PUSH);
-        this.writeInstruction(identifier.name);
+        this.writeInstruction(node.name);
         
         break;
       };
 
-      case "VariableDefinition": {
-        const definition = node as SVVariableDefinition;
-
-        const scope = this.getCurrentScope();
-
-        for(const variable of definition.variables) {
-          if(variable.value)
-            this.walkNode(variable.value)
-          else
-            this.writeInstruction(undefined);
-
-          const definition = scope.defineVariable(
-            variable.name, variable.kind, variable.constant
-          );
-
-          this.writeOp(
-            variable.constant ? opcodes.STORE_CONSTANT : opcodes.STORE_VARIABLE
-          );
-
-          this.writeInstruction(scope.id);
-          this.writeInstruction(definition.id);
+      case "VariableDeclaration": {
+        for(const declarator of node.declarations) {
+          this.walkNode(declarator);
         };
         
         break;
       };
+
+      case "VariableDeclarator": {
+        if(node.id.type !== 'Identifier') return;
+        
+        const scope = this.currentScope;
+
+        if(node.init)
+          this.walkNode(node.init)
+        else
+          this.writeInstruction(undefined);
+
+        const definition = scope.defineVariable(node.id.name);
+
+        this.writeOp(opcodes.STORE_VARIABLE);
+        this.writeInstruction(scope.id);
+        this.writeInstruction(definition.id);
+        
+        break;
+      };
+
+      case "BlockStatement": {
+        this.enterNewScope();
+
+        for(const statement of node.body) {
+          this.walkNode(statement);
+        };
+
+        this.exitScope();
+        
+        break;
+      };
+
+      case "ExpressionStatement": {
+        this.walkNode(node.expression);
+        
+        break;
+      };
+
+      case "EmptyStatement": {
+        break;
+      };
+
+      default: {
+        throw new Error("Unsupported node type: " + node.type);
+      };
     };
   };
 
-  public compile(nodeRoot: TNodesRoot) {
-    for(const node of nodeRoot) {
+  public compile(source: string) {
+    const tree = parseCode(source);
+
+    this.globals = getGlobals(tree);
+
+    for(const node of tree.program.body) {
       this.walkNode(node);
     };
 

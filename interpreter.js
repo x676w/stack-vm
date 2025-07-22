@@ -1,4 +1,4 @@
-(function StackVM() {
+(function StackVM(globalObject) {
   let pointer = 0;
 
   const program = __PROGRAM__;
@@ -71,12 +71,6 @@
       case __BINARY_BIT_AND__:
         stack.push(stack.pop() & stack.pop());
         break;
-      case __LOGICAL_OR__:
-        stack.push(stack.pop() || stack.pop());
-        break;
-      case __LOGICAL_AND__:
-        stack.push(stack.pop() && stack.pop());
-        break;
       case __UNARY_PLUS__:
         stack.push(+stack.pop());
         break;
@@ -88,9 +82,6 @@
         break;
       case __UNARY_BIT_NOT__:
         stack.push(~stack.pop());
-        break;
-      case __UNARY_TYPEOF__:
-        stack.push(typeof stack.pop());
         break;
       case __STORE_VARIABLE__:
         var value = stack.pop();
@@ -129,7 +120,7 @@
         stack.push(scopes[scopeId][definitionId]);
         break;
       case __LOAD_FROM_GLOBAL__:
-        stack.push(typeof window !== 'undefined' ? window[readInstruction()] : typeof global !== 'undefined' ? global[readInstruction()] : new Function('return this')()[readInstruction()]);
+        stack.push(globalObject[readInstruction()]);
         break;
       case __ASSIGN_VARIABLE__:
         var value = stack.pop();
@@ -217,4 +208,4 @@
   };
   
   while(stepWithDebug());
-}());
+}(this));

@@ -2,26 +2,22 @@ import fs from "fs";
 import path from "path";
 import traverse from "@babel/traverse";
 import generate from "@babel/generator";
-import Compiler from "./compiler/compiler";
-import Parser from "./parser/parser";
-import opcodes from "./opcodes";
+import Compiler from "./compiler/compiler.js";
+import opcodes from "./opcodes.js";
 import { minify } from "terser";
-import { parseCode, shuffleArray } from "./utils";
-import { SwitchCase, switchStatement } from "@babel/types";
+import { parseCode, shuffleArray } from "./utils.js";
+import { type SwitchCase, switchStatement } from "@babel/types";
 
 const interpreterPath = path.resolve(
   path.join("./", "interpreter.js")
 );
 
-async function obfuscate(code: string): Promise<string> {
+async function obfuscate(source: string): Promise<string> {
   let interpreter = fs.readFileSync(interpreterPath, "utf8");
 
-  const parser   = new Parser(),
-        compiler = new Compiler();
+  const compiler = new Compiler();
   
-  const nodesRoot = parser.parse(code);
-
-  const program = compiler.compile(nodesRoot);
+  const program = compiler.compile(source);
 
   interpreter = interpreter.replace(
     "__PROGRAM__",
@@ -39,7 +35,7 @@ async function obfuscate(code: string): Promise<string> {
 
   const intepreterAST = parseCode(interpreter);
 
-  traverse(intepreterAST, {
+  traverse.default(intepreterAST, {
     SwitchStatement: (path) => {
       const isVmCases = path.node.cases.every((_case) => {
         return _case.test?.type === 'NumericLiteral'
@@ -75,7 +71,7 @@ async function obfuscate(code: string): Promise<string> {
     }
   });
 
-  interpreter = generate(intepreterAST).code;
+  interpreter = generate.default(intepreterAST).code;
 
   interpreter = (await minify(interpreter, {
     module: true,

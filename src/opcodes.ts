@@ -1,4 +1,4 @@
-import { random } from "./utils";
+import { random } from "./utils.js";
 
 export interface IOperationCode {
   name: string;
@@ -54,14 +54,10 @@ const BINARY_BIT_XOR                   = new OperationCode("BINARY_BIT_XOR");
 const BINARY_BIT_OR                    = new OperationCode("BINARY_BIT_OR");
 const BINARY_BIT_AND                   = new OperationCode("BINARY_BIT_AND");
 
-const LOGICAL_OR                       = new OperationCode("LOGICAL_OR");
-const LOGICAL_AND                      = new OperationCode("LOGICAL_AND");
-
 const UNARY_PLUS                       = new OperationCode("UNARY_PLUS");
 const UNARY_MINUS                      = new OperationCode("UNARY_MINUS");
 const UNARY_NOT                        = new OperationCode("UNARY_NOT");
 const UNARY_BIT_NOT                    = new OperationCode("UNARY_BIT_NOT");
-const UNARY_TYPEOF                     = new OperationCode("UNARY_TYPEOF");
 
 const STORE_VARIABLE                   = new OperationCode("STORE_VARIABLE");
 const STORE_CONSTANT                   = new OperationCode("STORE_CONSTANT");
@@ -72,10 +68,6 @@ const ASSIGN_VARIABLE                  = new OperationCode("ASSIGN_VARIABLE");
 const BUILD_ARRAY                      = new OperationCode("BUILD_ARRAY");
 const BUILD_OBJECT                     = new OperationCode("BUILD_OBJECT");
 const BUILD_FUNCTION                   = new OperationCode("BUILD_FUNCTION");
-
-const JMP                              = new OperationCode("JMP");
-const JMP_IF_TRUE                      = new OperationCode("JMP_IF_TRUE");
-const JMP_IF_FALSE                     = new OperationCode("JMP_IF_FALSE");
 
 const GET_PROPERTY                     = new OperationCode("GET_PROPERTY");
 const SET_PROPERTY                     = new OperationCode("SET_PROPERTY");
@@ -109,14 +101,10 @@ export default {
   BINARY_BIT_OR,
   BINARY_BIT_AND,
 
-  LOGICAL_OR,
-  LOGICAL_AND,
-
   UNARY_PLUS,
   UNARY_MINUS,
   UNARY_NOT,
   UNARY_BIT_NOT,
-  UNARY_TYPEOF,
 
   STORE_VARIABLE,
   STORE_CONSTANT,
@@ -127,10 +115,6 @@ export default {
   BUILD_ARRAY,
   BUILD_OBJECT,
   BUILD_FUNCTION,
-
-  JMP,
-  JMP_IF_TRUE,
-  JMP_IF_FALSE,
 
   GET_PROPERTY,
   SET_PROPERTY,

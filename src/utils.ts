@@ -1,8 +1,10 @@
 import { parse } from "@babel/parser";
+import traverse from "@babel/traverse";
+import type { File } from "@babel/types";
 
 export function assert(condition: any, message: string) {
   if(!condition) {
-    throw new Error(message);
+    throw new Error("Assertion failed: " + message);
   };
 };
 
@@ -17,6 +19,20 @@ export function parseCode(code: string) {
   });
 
   return tree;
+};
+
+export function getGlobals(tree: File): Set<string> {
+  const globals = new Set<string>();
+
+  traverse.default(tree, {
+    Identifier(path) {
+      if(path.scope.hasGlobal(path.node.name) && !globals.has(path.node.name)) {
+        globals.add(path.node.name);
+      }
+    }
+  });
+
+  return globals;
 };
 
 export function shuffleArray(array: any[]) {
