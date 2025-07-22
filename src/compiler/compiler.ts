@@ -27,7 +27,11 @@ class Compiler {
   };
 
   private exitScope() {
-    const outerScope = this.currentScope.parent!;
+    const outerScope = this.currentScope.parent;
+
+    if(!outerScope) {
+      return;
+    };
 
     this.currentScope = outerScope;
   };
